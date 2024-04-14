@@ -1,28 +1,54 @@
-with open("story.txt", "r") as f:
-    story = f.read()
+import re
 
-words = set()
-start_of_word = -1
 
-target_start = "{"
-target_end = "}"
+def read_story(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        print("File not found.")
+        return None
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
 
-for i, char in enumerate(story):
-    if char == target_start:
-        start_of_word = i
 
-    if char == target_end and start_of_word != -1:
-        word = story[start_of_word : i + 1]
-        words.add(word)
-        start_of_word = -1
+def find_words_to_replace(story):
+    pattern = re.compile(r"\{.*?\}")
+    return set(pattern.findall(story))
 
-answers = {}
 
-for word in words:
-    answer = input(f"Enter a word for {word}: ")
-    answers[word] = answer
+def replace_words(story, words_to_replace, answers):
+    for word in words_to_replace:
+        if word in answers:
+            story = story.replace(word, answers[word])
+    return story
 
-for word in words:
-    story = story.replace(word, answers[word])
 
-print(story)
+def get_answers(words_to_replace):
+    answers = {}
+    for word in words_to_replace:
+        while True:
+            if answer := input(f"Enter a word for {word}: "):
+                answers[word] = answer
+                break
+            else:
+                print("Input cannot be empty.")
+    return answers
+
+
+def main():
+    story_path = "story.txt"
+    story = read_story(story_path)
+    if story is None:
+        return
+
+    words_to_replace = find_words_to_replace(story)
+    answers = get_answers(words_to_replace)
+    updated_story = replace_words(story, words_to_replace, answers)
+
+    print(updated_story)
+
+
+if __name__ == "__main__":
+    main()
