@@ -21,7 +21,7 @@ def find_words_to_replace(story):
 def replace_words(story, words_to_replace, answers):
     for word in words_to_replace:
         if word in answers:
-            story = story.replace(word, answers[word])
+            story = re.sub(re.escape(word), answers[word], story)
     return story
 
 
